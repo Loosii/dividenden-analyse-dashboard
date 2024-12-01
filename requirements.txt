@@ -2,7 +2,3 @@ yfinance
 pandas
 matplotlib
 streamlit
-numpy
-lxml
-requests
-
