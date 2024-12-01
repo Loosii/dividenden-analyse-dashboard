@@ -2,6 +2,24 @@ import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
+import smtplib
+from email.mime.text import MIMEText
+
+def send_email(to_email, subject, body):
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    from_email = "philipploos@gmail.com"  # Deine E-Mail
+    from_password = "Philipp.92!"  # Dein E-Mail-Passwort
+
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = from_email
+    msg["To"] = to_email
+
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()
+        server.login(from_email, from_password)
+        server.sendmail(from_email, to_email, msg.as_string())
 
 # Streamlit-Konfiguration
 st.title("Dividenden-Analyse-Dashboard")
@@ -31,6 +49,22 @@ else:
 
 # Zeitraum auswählen
 time_period = st.sidebar.selectbox("Zeitraum auswählen", ["1y", "2y", "5y", "10y", "20y"], index=2)
+
+# Alarm-Schwelle definieren
+st.sidebar.header("Alarmeinstellungen")
+alert_threshold = st.sidebar.number_input("Dividendenrendite-Alarm setzen (%)", min_value=0.0, max_value=100.0, step=0.1, value=5.0)
+email_address = st.sidebar.text_input("E-Mail-Adresse für Benachrichtigungen")
+
+# Alarme speichern
+if "alerts" not in st.session_state:
+    st.session_state["alerts"] = []
+
+if st.sidebar.button("Alarm speichern"):
+    st.session_state["alerts"].append({
+        "threshold": alert_threshold,
+        "email": email_address
+    })
+    st.success(f"Alarm bei Dividendenrendite > {alert_threshold}% für {email_address} gespeichert!")
 
 # Zeitraum korrekt interpretieren
 time_period_years = int(time_period[:-1])  # Entferne das "y" und wandle in eine Zahl um
@@ -80,7 +114,7 @@ else:
     history = history.copy()  # Explizite Kopie erstellen
     history['Dividendenrendite_geglättet'] = history['Dividendenrendite'].rolling(window=smoothing_window, min_periods=1).mean()
 
-    # Signalberechnung
+# Signalberechnung
     average_yield = history['Dividendenrendite'].mean()
     if not history['Dividendenrendite'].dropna().empty:
         current_yield = history['Dividendenrendite'].iloc[-1]  # Aktuelle Rendite
@@ -94,7 +128,27 @@ else:
         current_yield = None
         signal = "Keine Daten"
 
-    # Anzeige des Signals
+    # Signalberechnung und Alarme
+average_yield = history['Dividendenrendite'].mean()
+if not history['Dividendenrendite'].dropna().empty:
+    current_yield = history['Dividendenrendite'].iloc[-1]  # Aktuelle Rendite
+
+    # Alarm überprüfen und E-Mail senden
+    for alert in st.session_state["alerts"]:
+        if current_yield > alert["threshold"]:
+            st.warning(f"Alarm: Dividendenrendite von {current_yield:.2f}% hat die Schwelle von {alert['threshold']}% überschritten.")
+            try:
+                send_email(
+                    alert["email"],
+                    f"Dividendenalarm für {ticker.upper()}",
+                    f"Die Dividendenrendite von {ticker.upper()} beträgt {current_yield:.2f}% und hat die Schwelle von {alert['threshold']}% überschritten."
+                )
+                st.info(f"Benachrichtigung an {alert['email']} gesendet.")
+            except Exception as e:
+                st.error(f"Fehler beim Senden der E-Mail: {e}")
+
+
+# Anzeige des Signals
     st.subheader("Investitionssignal")
     if signal == "Kaufen":
         st.markdown(f'<h3 style="color:green;">Signal: {signal}</h3>', unsafe_allow_html=True)
