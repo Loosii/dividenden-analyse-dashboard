@@ -113,9 +113,9 @@ else:
 # Filter für den sichtbaren Zeitraum
 history = extended_history.loc[start_date:]
 
-# Sicherheitsprüfung für `history`
+# Sicherstellen, dass es Daten im sichtbaren Zeitraum gibt
 if history is None or history.empty:
-    st.error("Keine Daten im sichtbaren Zeitraum verfügbar.")
+    st.error("Keine Daten im ausgewählten Zeitraum verfügbar. Bitte wählen Sie einen anderen Zeitraum aus.")
 else:
     # Debugging: Zeige die ersten Zeilen von `history` an
     st.write("Debug: Inhalt von `history`", history.head())
