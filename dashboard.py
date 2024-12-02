@@ -75,7 +75,7 @@ for alert in st.session_state["alerts"]:
 
 # Alarme prüfen
 st.subheader("Alarmprüfung")
-current_yield = 6.5  # Beispielwert, später durch die berechnete Rendite ersetzen
+current_yield = 6.5 #Später durch korrekte Berechnung ersetzen
 triggered_alerts = check_alerts(current_yield, st.session_state["alerts"])
 for alert in triggered_alerts:
     st.warning(f"Alarm ausgelöst! Dividendenrendite {current_yield}% überschreitet {alert['threshold']}%.")
@@ -92,18 +92,11 @@ stock = yf.Ticker(ticker)
 extended_history = stock.history(start=extended_start_date, end=pd.Timestamp.today())
 dividends = stock.dividends
 
-# Debugging: Verfügbarkeit der Daten prüfen
-# st.write("### Verfügbarkeit der Kursdaten:")
-# st.write(extended_history)
-
-# st.write("### Verfügbarkeit der Dividenden-Daten:")
-# st.write(dividends)
-
 # Sicherstellen, dass der Index ein tz-naive DatetimeIndex ist
 extended_history.index = extended_history.index.tz_localize(None)
 dividends.index = dividends.index.tz_localize(None)  # Dividendenindex ebenfalls tz-naive machen
 
-# Fallback für fehlende Dividenden-Daten
+# Dividendenrendite berechnen
 if dividends.empty:
     st.warning("Keine Dividenden-Daten verfügbar. Dividendenrendite wird auf 0 gesetzt.")
     extended_history['Dividenden_12M'] = 0
@@ -111,7 +104,6 @@ if dividends.empty:
 else:
     dividenden_12m = []
     for date in extended_history.index:
-        date = date.tz_localize(None)  # Konvertiere den aktuellen Index-Wert zu tz-naive
         last_12_months = dividends[(dividends.index > date - pd.DateOffset(months=12)) & (dividends.index <= date)]
         dividenden_12m.append(last_12_months.sum())
     extended_history['Dividenden_12M'] = dividenden_12m
@@ -121,14 +113,24 @@ else:
 # Filter für den sichtbaren Zeitraum
 history = extended_history.loc[start_date:]
 
-# Sicherstellen, dass es Daten im sichtbaren Zeitraum gibt
+# Sicherheitsprüfung für `history`
 if history is None or history.empty:
-    st.error("Keine Daten im ausgewählten Zeitraum verfügbar. Bitte wählen Sie einen anderen Zeitraum aus.")
+    st.error("Keine Daten im sichtbaren Zeitraum verfügbar.")
 else:
-    # Gleitender Mittelwert für Dividendenrendite
-    smoothing_window = st.sidebar.slider("Glättungsfenster (in Tagen)", min_value=5, max_value=90, value=30)
-    history = history.copy()  # Explizite Kopie erstellen
-    history['Dividendenrendite_geglättet'] = history['Dividendenrendite'].rolling(window=smoothing_window, min_periods=1).mean()
+    # Debugging: Zeige die ersten Zeilen von `history` an
+    st.write("Debug: Inhalt von `history`", history.head())
+
+    # Berechnung der aktuellen Dividendenrendite
+    if "Dividendenrendite" in history.columns:
+        current_yield = history['Dividendenrendite'].iloc[-1]
+    else:
+        current_yield = None
+
+    if current_yield is None or pd.isna(current_yield):
+        st.error("Keine gültige Dividendenrendite verfügbar. Überprüfen Sie die Daten.")
+    else:
+        st.write(f"Aktuelle Dividendenrendite: {current_yield:.2f}%")
+        st.write("Debug: Letzte Zeile von `history`", history.iloc[-1])
 
 # Signalberechnung
     average_yield = history['Dividendenrendite'].mean()
