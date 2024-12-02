@@ -68,7 +68,7 @@ if st.sidebar.button("Alarm speichern"):
 # Gespeicherte Alarme anzeigen
 st.subheader("Gespeicherte Alarme")
 for alert in st.session_state["alerts"]:
-    st.write(f"Alarm {stock}: Dividendenrendite über {alert['threshold']}% | E-Mail: {alert['email']}")
+    st.write(f"Alarm: Dividendenrendite über {alert['threshold']}% | E-Mail: {alert['email']}")
 
 # Zeitraum korrekt interpretieren
 time_period_years = int(time_period[:-1])  # Entferne das "y" und wandle in eine Zahl um
