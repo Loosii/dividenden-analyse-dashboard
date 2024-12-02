@@ -110,7 +110,7 @@ else:
     history['Dividendenrendite_geglättet'] = history['Dividendenrendite'].rolling(window=smoothing_window, min_periods=1).mean()
 
     # Debugging: Überprüfen der geglätteten Werte
-    st.write("Debug: Geglättete Dividendenrendite", history['Dividendenrendite_geglättet'].tail())
+    #st.write("Debug: Geglättete Dividendenrendite", history['Dividendenrendite_geglättet'].tail())
 
     # Chart mit geglätteter Dividendenrendite
     fig, ax1 = plt.subplots(figsize=(12, 6))
