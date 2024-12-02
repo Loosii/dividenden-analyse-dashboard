@@ -19,6 +19,6 @@ def save_alerts_to_file(alerts, filename="alerts.json"):
 
 def add_alert(threshold, email, alerts, filename="alerts.json"):
     alerts.append({"threshold": threshold, "email": email})
-    save_alerts_to_file(alerts, filename)
+    save_alerts_to_file(alerts, filename="alerts.json")
     return alerts
 
