@@ -9,8 +9,8 @@ import streamlit as st
 def send_email(to_email, subject, body):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
-    email_user = st.secrets["email"]["username"]
-    email_password = st.secrets["email"]["password"]
+    from_email = st.secrets["email"]["username"]
+    from_password = st.secrets["email"]["password"]
 
     msg = MIMEText(body)
     msg["Subject"] = subject
