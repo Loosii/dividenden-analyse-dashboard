@@ -155,5 +155,6 @@ else:
     # Statistiken anzeigen
     st.subheader("Statistische Analyse")
     st.write(f"**Durchschnittliche geglättete Dividendenrendite:** {average_yield:.2f}%")
+    st.write(f"**Aktuelle geglättete Dividendenrendite:** {current_yield:.2f}%")
     st.write(f"**Minimale geglättete Dividendenrendite:** {history['Dividendenrendite_geglättet'].min():.2f}%")
     st.write(f"**Maximale geglättete Dividendenrendite:** {history['Dividendenrendite_geglättet'].max():.2f}%")
