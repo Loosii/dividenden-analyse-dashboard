@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
+import streamlit as st
 
 def send_email(to_email, subject, body):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
-    from_email = "philipploos@gmail.com"  # Deine E-Mail
-    from_password = "iiqy ocxl byag smnt"  # Dein E-Mail-Passwort
+    from_email = st.secrets["email"]["username"]
+    from_password = st.secrets["email"]["password"]
 
     msg = MIMEText(body)
     msg["Subject"] = subject
