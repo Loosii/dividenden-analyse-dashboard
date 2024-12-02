@@ -5,6 +5,7 @@ import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
 import streamlit as st
+from alerts import load_alerts_from_file, save_alerts_to_file, add_alert, check_alerts
 
 def send_email(to_email, subject, body):
     smtp_server = "smtp.gmail.com"
@@ -21,6 +22,10 @@ def send_email(to_email, subject, body):
         server.starttls()
         server.login(from_email, from_password)
         server.sendmail(from_email, to_email, msg.as_string())
+
+# Alarme laden
+if "alerts" not in st.session_state:
+    st.session_state["alerts"] = load_alerts_from_file()
 
 # Streamlit-Konfiguration
 st.title("Dividenden-Analyse-Dashboard")
@@ -57,15 +62,25 @@ alert_threshold = st.sidebar.number_input("Dividendenrendite-Alarm setzen (%)", 
 email_address = st.sidebar.text_input("E-Mail-Adresse für Benachrichtigungen")
 
 # Alarme speichern
-if "alerts" not in st.session_state:
-    st.session_state["alerts"] = []
-
 if st.sidebar.button("Alarm speichern"):
-    st.session_state["alerts"].append({
-        "threshold": alert_threshold,
-        "email": email_address
-    })
+    st.session_state["alerts"] = add_alert(alert_threshold, email_address, st.session_state["alerts"])
+    st.success(f"Alarm bei {alert_threshold}% für {email_address} gespeichert!")
+
     st.success(f"Alarm bei Dividendenrendite > {alert_threshold}% für {email_address} gespeichert!")
+
+# Gespeicherte Alarme anzeigen
+st.subheader("Gespeicherte Alarme")
+for alert in st.session_state["alerts"]:
+    st.write(f"Alarm: Dividendenrendite über {alert['threshold']}% | E-Mail: {alert['email']}")
+
+# Alarme prüfen
+st.subheader("Alarmprüfung")
+current_yield = 6.5  # Beispielwert, später durch die berechnete Rendite ersetzen
+triggered_alerts = check_alerts(current_yield, st.session_state["alerts"])
+for alert in triggered_alerts:
+    st.warning(f"Alarm ausgelöst! Dividendenrendite {current_yield}% überschreitet {alert['threshold']}%.")
+    # Optional: E-Mail senden
+    # send_email(alert["email"], "Dividendenalarm", f"Die Dividendenrendite hat {alert['threshold']}% überschritten.")
 
 # Zeitraum korrekt interpretieren
 time_period_years = int(time_period[:-1])  # Entferne das "y" und wandle in eine Zahl um
