@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
-from alerts import load_alerts_from_file, save_alerts_to_file, add_alert, check_alerts
+from alerts import load_alerts_from_file, save_alerts_to_file, add_alert
 
 def send_email(to_email, subject, body):
     smtp_server = "smtp.gmail.com"
