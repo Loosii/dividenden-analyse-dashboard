@@ -68,20 +68,6 @@ if st.sidebar.button("Alarm speichern"):
 
     st.success(f"Alarm bei Dividendenrendite > {alert_threshold}% für {email_address} gespeichert!")
 
-# Gespeicherte Alarme anzeigen
-st.subheader("Gespeicherte Alarme")
-for alert in st.session_state["alerts"]:
-    st.write(f"Alarm: Dividendenrendite über {alert['threshold']}% | E-Mail: {alert['email']}")
-
-# Alarme prüfen
-st.subheader("Alarmprüfung")
-current_yield = 6.5 #Später durch korrekte Berechnung ersetzen
-triggered_alerts = check_alerts(current_yield, st.session_state["alerts"])
-for alert in triggered_alerts:
-    st.warning(f"Alarm ausgelöst! Dividendenrendite {current_yield}% überschreitet {alert['threshold']}%.")
-    # Optional: E-Mail senden
-    # send_email(alert["email"], "Dividendenalarm", f"Die Dividendenrendite hat {alert['threshold']}% überschritten.")
-
 # Zeitraum korrekt interpretieren
 time_period_years = int(time_period[:-1])  # Entferne das "y" und wandle in eine Zahl um
 start_date = pd.Timestamp.today() - pd.DateOffset(years=time_period_years)  # Startdatum berechnen
