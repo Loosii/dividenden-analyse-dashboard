@@ -22,3 +22,9 @@ def add_alert(threshold, email, alerts, filename="alerts.json"):
     save_alerts_to_file(alerts, filename="alerts.json")
     return alerts
 
+def check_alerts(current_yield, alerts):
+    triggered_alerts = []
+    for alert in alerts:
+        if current_yield > alert["threshold"]:
+            triggered_alerts.append(alert)
+    return triggered_alerts
