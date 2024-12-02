@@ -9,7 +9,7 @@ def send_email(to_email, subject, body):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     from_email = "philipploos@gmail.com"  # Deine E-Mail
-    from_password = "Philipp.92!"  # Dein E-Mail-Passwort
+    from_password = "Schimmel.92!"  # Dein E-Mail-Passwort
 
     msg = MIMEText(body)
     msg["Subject"] = subject
