@@ -122,7 +122,7 @@ else:
 history = extended_history.loc[start_date:]
 
 # Sicherstellen, dass es Daten im sichtbaren Zeitraum gibt
-if history.empty:
+if history is None or history.empty:
     st.error("Keine Daten im ausgewählten Zeitraum verfügbar. Bitte wählen Sie einen anderen Zeitraum aus.")
 else:
     # Gleitender Mittelwert für Dividendenrendite
