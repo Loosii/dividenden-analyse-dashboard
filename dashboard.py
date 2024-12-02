@@ -107,6 +107,7 @@ if history is None or history.empty:
 else:
     # Berechnung der geglätteten Dividendenrendite
     smoothing_window = st.sidebar.slider("Glättungsfenster (in Tagen)", min_value=5, max_value=90, value=30)
+    history = history.copy()  # Explizite Kopie erstellen
     history['Dividendenrendite_geglättet'] = history['Dividendenrendite'].rolling(window=smoothing_window, min_periods=1).mean()
 
     # Debugging: Überprüfen der geglätteten Werte
