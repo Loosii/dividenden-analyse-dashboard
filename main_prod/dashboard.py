@@ -1,26 +1,9 @@
-import yfinance as yf
 import pandas as pd
-import matplotlib.pyplot as plt
 import streamlit as st
-import smtplib
-from email.mime.text import MIMEText
-from alerts import load_alerts_from_file, save_alerts_to_file, add_alert, check_alerts
-
-def send_email(to_email, subject, body):
-    smtp_server = "smtp.gmail.com"
-    smtp_port = 587
-    from_email = st.secrets["email"]["username"]
-    from_password = st.secrets["email"]["password"]
-
-    msg = MIMEText(body)
-    msg["Subject"] = subject
-    msg["From"] = from_email
-    msg["To"] = to_email
-
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
-        server.login(from_email, from_password)
-        server.sendmail(from_email, to_email, msg.as_string())
+import matplotlib.pyplot as plt
+from stock_data import fetch_stock_data, calculate_dividend_yield
+from alerts import load_alerts_from_file, add_alert, check_alerts
+from email_utils import send_email
 
 # Alarme laden
 if "alerts" not in st.session_state:
@@ -76,30 +59,13 @@ start_date = pd.Timestamp.today() - pd.DateOffset(years=time_period_years)  # St
 extended_start_date = start_date - pd.DateOffset(years=1)  # 1 Jahr vor dem Startdatum
 
 # Abrufen des erweiterten Zeitraums
-stock = yf.Ticker(ticker)
-extended_history = stock.history(start=extended_start_date, end=pd.Timestamp.today())
-dividends = stock.dividends
+extended_history, dividends = fetch_stock_data(ticker, extended_start_date, pd.Timestamp.today())
 
-# Sicherstellen, dass der Index ein tz-naive DatetimeIndex ist
-extended_history.index = extended_history.index.tz_localize(None)
-dividends.index = dividends.index.tz_localize(None)  # Dividendenindex ebenfalls tz-naive machen
-
-# Dividendenrendite berechnen
-if dividends.empty:
-    st.warning("Keine Dividenden-Daten verfügbar. Dividendenrendite wird auf 0 gesetzt.")
-    extended_history['Dividenden_12M'] = 0
-    extended_history['Dividendenrendite'] = 0
-else:
-    dividenden_12m = []
-    for date in extended_history.index:
-        last_12_months = dividends[(dividends.index > date - pd.DateOffset(months=12)) & (dividends.index <= date)]
-        dividenden_12m.append(last_12_months.sum())
-    extended_history['Dividenden_12M'] = dividenden_12m
-    extended_history['Dividendenrendite'] = (extended_history['Dividenden_12M'] / extended_history['Close']) * 100
-    extended_history['Dividendenrendite'] = extended_history['Dividendenrendite'].replace(0, float('nan'))
+# Berechnen der Dividendenrendite
+history = calculate_dividend_yield(extended_history, dividends)
 
 # Filter für den sichtbaren Zeitraum
-history = extended_history.loc[start_date:]
+history = history.loc[start_date:]
 
 # Sicherheitsprüfung für `history`
 if history is None or history.empty:
@@ -107,11 +73,8 @@ if history is None or history.empty:
 else:
     # Berechnung der geglätteten Dividendenrendite
     smoothing_window = st.sidebar.slider("Glättungsfenster (in Tagen)", min_value=5, max_value=90, value=30)
-    history = history.copy()  # Explizite Kopie erstellen
+    history = history.copy()  # Create a copy of the DataFrame to avoid the warning
     history['Dividendenrendite_geglättet'] = history['Dividendenrendite'].rolling(window=smoothing_window, min_periods=1).mean()
-
-    # Debugging: Überprüfen der geglätteten Werte
-    #st.write("Debug: Geglättete Dividendenrendite", history['Dividendenrendite_geglättet'].tail())
 
     # Chart mit geglätteter Dividendenrendite
     fig, ax1 = plt.subplots(figsize=(12, 6))
