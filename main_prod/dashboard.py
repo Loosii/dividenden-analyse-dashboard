@@ -83,7 +83,7 @@ else:
     ax1.tick_params(axis="y", labelcolor="blue")
 
     ax2 = ax1.twinx()
-    ax2.plot(history.index, history['Dividendenrendite_geglättet'], label="Geglättete Dividendenrendite", color="green", linestyle="--")
+    ax2.plot(history.index, history['Dividendenrendite_geglättet'], label="Dividendenrendite", color="green", linestyle="--")
     ax2.set_ylabel("Dividendenrendite (%)", color="green")
     ax2.tick_params(axis="y", labelcolor="green")
 
