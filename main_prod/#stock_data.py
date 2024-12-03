@@ -1,8 +1,6 @@
 import yfinance as yf
 import pandas as pd
-import streamlit as st
 
-@st.cache_data
 def fetch_stock_data(ticker, start_date, end_date):
     stock = yf.Ticker(ticker)
     extended_history = stock.history(start=start_date, end=end_date)
@@ -11,7 +9,6 @@ def fetch_stock_data(ticker, start_date, end_date):
     dividends.index = dividends.index.tz_localize(None)  # Dividendenindex ebenfalls tz-naive machen
     return extended_history, dividends
 
-@st.cache_data
 def calculate_dividend_yield(extended_history, dividends):
     if dividends.empty:
         return extended_history.assign(Dividenden_12M=0, Dividendenrendite=0)
