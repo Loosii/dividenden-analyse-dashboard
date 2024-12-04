@@ -74,7 +74,7 @@ else:
     # Berechnung der geglätteten Dividendenrendite
     smoothing_window = st.sidebar.slider("Glättungsfenster (in Tagen)", min_value=5, max_value=90, value=30)
     history = history.copy()  # Create a copy of the DataFrame to avoid the warning
-    history['Dividendenrendite_geglättet'] = history['Dividendenrendite'].rolling(window=smoothing_window, min_periods=1).mean()
+    history.loc[:, 'Dividendenrendite_geglättet'] = history['Dividendenrendite'].rolling(window=smoothing_window, min_periods=1).mean()
 
     # Chart mit geglätteter Dividendenrendite
     fig, ax1 = plt.subplots(figsize=(12, 6))
