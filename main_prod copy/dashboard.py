@@ -27,8 +27,8 @@ if st.sidebar.button("Ticker hinzufügen"):
     else:
         # Ticker validieren
         if validate_ticker(new_ticker):    
-            st.session_state["stock_list"].append(new_ticker.upper())
-            st.success(f"Ticker {new_ticker.upper()} erfolgreich hinzugefügt!")
+            st.session_state["stock_list"].append(new_ticker)
+            st.success(f"Ticker {new_ticker} erfolgreich hinzugefügt!")
         else:
             st.warning(f"Ticker {new_ticker} ist ungültig. Bitte überprüfen Sie den Ticker.")
         

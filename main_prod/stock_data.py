@@ -3,6 +3,18 @@ import pandas as pd
 import streamlit as st
 
 @st.cache_data
+def validate_ticker(ticker):
+    try:
+        stock = yf.Ticker(ticker)
+        # Versuchen, historische Daten für den Ticker abzurufen
+        history = stock.history(period="1d")  # Abrufen eines Tagesdatensatzes
+        if history.empty:
+            return False
+        return True
+    except (KeyError, ValueError, IndexError, Exception):
+        return False
+
+@st.cache_data
 def fetch_stock_data(ticker, start_date, end_date):
     stock = yf.Ticker(ticker)
     extended_history = stock.history(start=start_date, end=end_date)

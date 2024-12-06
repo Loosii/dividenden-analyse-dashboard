@@ -1,19 +1,18 @@
 import yfinance as yf
+import pandas as pd
+import streamlit as st
 
-# Funktion zur Validierung des Tickers
+@st.cache_data
 def validate_ticker(ticker):
     try:
         stock = yf.Ticker(ticker)
-        stock_info = stock.info
-        # Überprüfen, ob der Ticker ein reguläres Marktpreisfeld hat
-        if stock_info.get("regularMarketPrice") is None:
+        # Versuchen, historische Daten für den Ticker abzurufen
+        history = stock.history(period="1d")  # Abrufen eines Tagesdatensatzes
+        if history.empty:
             return False
         return True
-    except Exception as e:
+    except (KeyError, ValueError, IndexError, Exception):
         return False
-
-import pandas as pd
-import streamlit as st
 
 @st.cache_data
 def fetch_stock_data(ticker, start_date, end_date):
