@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
-from stock_data import fetch_stock_data, calculate_dividend_yield
+from stock_data import validate_ticker,fetch_stock_data, calculate_dividend_yield
 from alerts import load_alerts_from_file, add_alert, check_alerts
 from email_utils import send_email
 
@@ -20,11 +20,18 @@ if "stock_list" not in st.session_state:
 # Eingabefeld zum Hinzufügen eines neuen Tickers
 new_ticker = st.sidebar.text_input("Neuen Aktien-Ticker hinzufügen", value="")
 if st.sidebar.button("Ticker hinzufügen"):
-    if new_ticker.upper() not in st.session_state["stock_list"]:
-        st.session_state["stock_list"].append(new_ticker.upper())
-        st.success(f"Ticker {new_ticker.upper()} hinzugefügt!")
-    else:
+    new_ticker = new_ticker.upper()  # Ticker in Großbuchstaben umwandeln
+    # Überprüfen, ob der Ticker bereits in der Liste ist
+    if new_ticker.upper() in st.session_state["stock_list"]:
         st.warning(f"Ticker {new_ticker.upper()} ist bereits in der Liste.")
+    else:
+        # Ticker validieren
+        if validate_ticker(new_ticker):    
+            st.session_state["stock_list"].append(new_ticker.upper())
+            st.success(f"Ticker {new_ticker.upper()} erfolgreich hinzugefügt!")
+        else:
+            st.warning(f"Ticker {new_ticker} ist ungültig. Bitte überprüfen Sie den Ticker.")
+        
 
 # Auswahlliste für den Benutzer
 if len(st.session_state["stock_list"]) > 0:
