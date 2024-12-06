@@ -102,6 +102,21 @@ else:
     if not history['Dividendenrendite_geglättet'].dropna().empty:
         current_yield = history['Dividendenrendite_geglättet'].iloc[-1]  # Aktuelle Rendite
 
+        # Signal
+        if current_yield > average_yield * 1.2:
+            signal = "Kaufen"
+            signal_color = "green"
+        elif current_yield < average_yield * 0.8:
+            signal = "Verkaufen"
+            signal_color = "red"
+        else:
+            signal = "Halten"
+            signal_color = "orange"
+
+        # Anzeige des Signals
+        st.subheader("Investitionssignal")
+        st.markdown(f"##### Signal: **{signal}**", unsafe_allow_html=True)
+
         for alert in st.session_state["alerts"]:
             if current_yield > alert["threshold"]:
                 st.warning(f"Alarm: Dividendenrendite von {current_yield:.2f}% hat die Schwelle von {alert['threshold']}% überschritten.")
