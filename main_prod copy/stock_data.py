@@ -1,4 +1,17 @@
 import yfinance as yf
+
+# Funktion zur Validierung des Tickers
+def validate_ticker(ticker):
+    try:
+        stock = yf.Ticker(ticker)
+        stock_info = stock.info
+        # Überprüfen, ob der Ticker ein reguläres Marktpreisfeld hat
+        if stock_info.get("regularMarketPrice") is None:
+            return False
+        return True
+    except Exception as e:
+        return False
+
 import pandas as pd
 import streamlit as st
 
