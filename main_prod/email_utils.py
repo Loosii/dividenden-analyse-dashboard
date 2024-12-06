@@ -1,6 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 import streamlit as st
+import re
 
 def send_email(to_email, subject, body):
     smtp_server = "smtp.gmail.com"
@@ -17,3 +18,11 @@ def send_email(to_email, subject, body):
         server.starttls()
         server.login(from_email, from_password)
         server.sendmail(from_email, to_email, msg.as_string())
+
+def validate_email(email):
+    email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if re.match(email_regex, email):
+        return True
+    else:
+        return False
+    

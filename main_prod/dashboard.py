@@ -1,9 +1,9 @@
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
-from stock_data import validate_ticker,fetch_stock_data, calculate_dividend_yield
-from alerts import load_alerts_from_file, add_alert, check_alerts
-from email_utils import send_email
+from stock_data import validate_ticker,fetch_stock_data,calculate_dividend_yield
+from alerts import load_alerts_from_file, add_alert,check_alerts
+from email_utils import send_email,validate_email
 
 # Alarme laden
 if "alerts" not in st.session_state:
@@ -51,8 +51,11 @@ email_address = st.sidebar.text_input("E-Mail-Adresse für Benachrichtigungen")
 
 # Alarme speichern
 if st.sidebar.button("Alarm speichern"):
-    st.session_state["alerts"] = add_alert(alert_threshold, email_address, st.session_state["alerts"])
-    st.success(f"Alarm bei Dividendenrendite > {alert_threshold}% für {email_address} gespeichert!")
+    if validate_email(email_address):
+        st.session_state["alerts"] = add_alert(alert_threshold, email_address, st.session_state["alerts"])
+        st.success(f"Alarm bei Dividendenrendite > {alert_threshold}% für {email_address} gespeichert!")
+    else:
+        st.warning(f"Die eingegebene E-Mail-Adresse ist ungültig. Bitte überprüfen Sie sie.")
 
 # Gespeicherte Alarme anzeigen
 st.subheader("Gespeicherte Alarme")
