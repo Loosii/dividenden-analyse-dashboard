@@ -126,6 +126,7 @@ else:
         st.subheader("Investitionssignal")
         st.markdown(f"##### Signal: **{signal}**", unsafe_allow_html=True)
 
+        #Alarm
         for alert in st.session_state["alerts"]:
             if current_yield > alert["threshold"]:
                 st.warning(f"Alarm: Dividendenrendite von {current_yield:.2f}% hat die Schwelle von {alert['threshold']}% überschritten.")

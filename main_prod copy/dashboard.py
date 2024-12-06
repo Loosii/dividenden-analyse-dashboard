@@ -32,7 +32,6 @@ if st.sidebar.button("Ticker hinzufügen"):
         else:
             st.warning(f"Ticker {new_ticker} ist ungültig. Bitte überprüfen Sie den Ticker.")
         
-
 # Auswahlliste für den Benutzer
 if len(st.session_state["stock_list"]) > 0:
     ticker = st.sidebar.selectbox("Aktie auswählen", st.session_state["stock_list"])
