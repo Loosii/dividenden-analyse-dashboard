@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import yfinance as yf
 import matplotlib.pyplot as plt
 from stock_data import validate_ticker,fetch_stock_data,calculate_dividend_yield
 from alerts import load_alerts_from_file, add_alert,check_alerts
